@@ -20,6 +20,16 @@ export async function HTTPAddBarang(params: IAddBarang): Promise<any> {
   })
 }
 
+export async function HTTPReadBarang(): Promise<any> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const responseGetbarang = await AxiosNormal(2000).get(`${DevApiUrl}/barangs`)
+      return resolve(responseGetbarang)
+    } catch (error) {
+      return reject(error)
+    }
+  })
+}
 
 export async function HTTPUpdateBarang(params: IUpdateBarang): Promise<any> {
   return new Promise(async (resolve, reject) => {
@@ -40,11 +50,11 @@ export async function HTTPUpdateBarang(params: IUpdateBarang): Promise<any> {
   })
 }
 
-export async function HTTPReadBarang(): Promise<any> {
+export async function HTTPDeleteBarang(params: {id: any}): Promise<any> {
   return new Promise(async (resolve, reject) => {
     try {
-      const responseGetbarang = await AxiosNormal(2000).get(`${DevApiUrl}/barangs`)
-      return resolve(responseGetbarang)
+      const responseDeletebarang = await AxiosNormal(2000).get(`${DevApiUrl}/barang/${params.id}`)
+      return resolve(responseDeletebarang)
     } catch (error) {
       return reject(error)
     }

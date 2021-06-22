@@ -24,8 +24,6 @@ app.listen(port, () => {
 
 
 const moment = require('moment')
-let photo_file = "foto_barang_" + moment().format('YYYY_MM_DD_HH_mm_ss') + ".png";
-let next_path = "/server/uploads/";
 
 app.get("/api/barangs", (req, res, next) => {
   var sql = "select * from barang"
@@ -54,14 +52,30 @@ app.get("/api/barang/:id", (req, res, next) => {
       });
       return;
     }
-    res.json({
-      "message": "sukses",
-      "data": row
-    })
+
+    fs.unlinkSync(rootDir + next_path + row.foto)
+    
+    db.run(
+    'DELETE FROM barang WHERE id = ?',
+    req.params.id,
+    function (err, result) {
+      if (err) {
+        res.status(400).json({
+          "error": res.message
+        })
+        return;
+      }
+      res.json({
+        "message": "sukses hapus data",
+      })
+    });
   });
 });
 
 app.post("/api/barang", (req, res, next) => {
+  let photo_file = "foto_barang_" + moment().format('YYYY_MM_DD_HH_mm_ss') + ".png";
+  let next_path = "/server/uploads/";
+
   var data = {
     nama_barang: req.body.nama_barang,
     harga_beli: req.body.harga_beli,
@@ -115,6 +129,9 @@ app.post("/api/barang", (req, res, next) => {
 })
 
 app.put("/api/barang/:id", (req, res, next) => {
+  let photo_file = "foto_barang_" + moment().format('YYYY_MM_DD_HH_mm_ss') + ".png";
+  let next_path = "/server/uploads/";
+  
   var data = {
     nama_barang: req.body.nama_barang,
     harga_beli: req.body.harga_beli,
@@ -125,14 +142,12 @@ app.put("/api/barang/:id", (req, res, next) => {
   // return console.log(req.body);
 
   if (req.body.foto_baru !== '') {
-    fs.unlinkSync(rootDir + next_path + req.body.foto_lama)
     // Base64 to Img
-    let base64Image = req.body.foto.split(";base64,").pop();
-    let base64Type = req.body.foto.split(";base64,", 1).pop();
+    let base64Image = req.body.foto_baru.split(";base64,").pop();
+    let base64Type = req.body.foto_baru.split(";base64,", 1).pop();
   
     if (base64Type === "data:image/jpeg" || base64Type === "data:image/jpg" || base64Type === "data:image/png") {
       try {
-  
         fs.writeFile(
           rootDir + next_path + photo_file, base64Image, {
             encoding: "base64"
@@ -141,6 +156,8 @@ app.put("/api/barang/:id", (req, res, next) => {
             console.log("File created " + photo_file);
           }
         );
+
+        fs.unlinkSync(rootDir + next_path + req.body.foto_lama)
   
         db.run(
           `UPDATE barang set 
@@ -204,23 +221,39 @@ app.put("/api/barang/:id", (req, res, next) => {
 
 })
 
-app.delete("/api/barang/:id", (req, res, next) => {
-  db.run(
-    'DELETE FROM barang WHERE id = ?',
-    req.params.id,
-    function (err, result) {
-      if (err) {
-        res.status(400).json({
-          "error": res.message
-        })
-        return;
-      }
-      res.json({
-        "message": "deleted",
-        rows: this.changes
-      })
-    });
-})
+// app.get("/api/barang/:id", (req, res, next) => {
+  // var sql = "select * from barang where id = ?"
+  // var params = [req.params.id]
+  // db.get(sql, params, (err, row) => {
+  //   if (err) {
+  //     res.status(400).json({
+  //       "error": err.message
+  //     });
+  //     return;
+  //   }
+  //   res.json({
+  //     "message": "sukses",
+  //     "data": row
+  //   })
+  // });
+      
+  // fs.unlinkSync(rootDir + next_path + res.)
+  // )
+  // db.run(
+  //   'DELETE FROM barang WHERE id = ?',
+  //   req.params.id,
+  //   function (err, result) {
+  //     if (err) {
+  //       res.status(400).json({
+  //         "error": res.message
+  //       })
+  //       return;
+  //     }
+  //     res.json({
+  //       "message": "sukses hapus data",
+  //     })
+  //   });
+// })
 
 
 // Root path

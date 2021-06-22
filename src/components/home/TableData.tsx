@@ -7,7 +7,7 @@ import React from 'react'
 import { MdAdd, MdDelete, MdModeEdit } from "react-icons/md";
 import ThemeMUI from '../../helpers/theme';
 import { useDropzone } from 'react-dropzone';
-import { HTTPAddBarang, HTTPReadBarang, HTTPUpdateBarang } from '../../helpers/http';
+import { HTTPAddBarang, HTTPDeleteBarang, HTTPReadBarang, HTTPUpdateBarang } from '../../helpers/http';
 import { DevImageUrl } from '../../helpers/interceptors';
 import { IAddBarang } from '../../helpers/interfaceHttp';
 import { Modal } from 'react-responsive-modal';
@@ -96,7 +96,7 @@ function Previews(props: IPreviews) {
 
 const MemoPreviews = React.memo(Previews)
 
-const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpGetdata: any}) => {
+const ModalEdit = (props: { visibleModalEdit: any, closeModalEdit: any, data: any, httpGetdata: any}) => {
   const classes = useStyles()
   const [editedIndex, seteditedIndex] = React.useState(0);
   const [loadingCircular, setLoadingCircular] = React.useState(false);
@@ -108,7 +108,7 @@ const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpG
   const [imageOld, setimageOld]: any = React.useState('')
   const [imagePreview, setimagePreview] = React.useState('')
   const [imageContent, setimageContent] = React.useState('')
-  const [isPublish, setisPublish] = React.useState<any>(false)
+  const [isPublishEdit, setisPublishEdit] = React.useState<any>(false)
 
   function eventImagePreview(image: any) {
     setimagePreview(image)
@@ -119,7 +119,7 @@ const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpG
   }
 
   function eventHandlerPublish(data: any) {
-    setisPublish(data)
+    setisPublishEdit(data)
   }
 
   const httpUpdate = async () => {
@@ -143,12 +143,12 @@ const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpG
 
       setTimeout(() => {
         setLoadingCircular(false)
-        props.closeModal()
+        props.closeModalEdit()
       }, 1000);
     } catch (error) {
       console.log(error)
       setLoadingCircular(false)
-      props.closeModal()
+      props.closeModalEdit()
     }
   }
 
@@ -164,11 +164,11 @@ const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpG
 
   return(
     <Modal
-      open={props.visibleModal}
+      open={props.visibleModalEdit}
       onClose={() => {
         setimageContent('')
         setimagePreview('')
-        props.closeModal()
+        props.closeModalEdit()
       }}
       center
       closeOnOverlayClick={false}
@@ -241,7 +241,7 @@ const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpG
           value={stok}
         />
 
-        <MemoPreviews imagePreview={eventImagePreview} imageContent={eventImageContent} isPublish={isPublish} eventPublish={eventHandlerPublish} />
+        <MemoPreviews imagePreview={eventImagePreview} imageContent={eventImageContent} isPublish={isPublishEdit} eventPublish={eventHandlerPublish} />
         {
           imagePreview !== ''
             ?
@@ -260,7 +260,19 @@ const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpG
         }
 
         <Typography component="div" style={{ marginTop: '10px' }}>
-          <Button onClick={props.closeModal} color="secondary" disabled={loadingCircular}>
+          <Button 
+            onClick={() => {
+              setnamaBarang('')
+              sethargaBeli(0)
+              sethargaJual(0)
+              setstok(0)
+              setimagePreview('')
+              setimageContent('')
+              setimageOld('')
+              props.closeModalEdit()
+            }} 
+            color="secondary" disabled={loadingCircular}
+          >
             Batal
           </Button>
           <Button
@@ -284,22 +296,81 @@ const ModalEdit = (props: { visibleModal: any, closeModal: any, data: any, httpG
   )
 }
 
+const ModalDelete = (props: { visibleModalDelete: any, closeModalDelete: any, httpDeleteData: any}) => {
+
+  const [loadingCircular, setLoadingCircular] = React.useState(false);
+
+  return(
+    <Modal
+      open={props.visibleModalDelete}
+      onClose={() => {
+        props.closeModalDelete()
+      }}
+      center
+      closeOnOverlayClick={false}
+      closeOnEsc={false}
+      classNames={{
+        overlay: 'customOverlay'
+      }}
+    >
+      <Typography variant="subtitle1" style={{marginTop: '30px'}}>
+        Yakin ingin hapus data ini ?
+      </Typography>
+      <Typography component="div" style={{ marginTop: '10px' }}>
+        <Button onClick={props.closeModalDelete} color="secondary" disabled={loadingCircular}>
+          Batal
+        </Button>
+        <Button
+          color="primary"
+          onClick={() => {
+            props.httpDeleteData()
+          }}
+          disabled={loadingCircular}
+        >
+          {
+            loadingCircular === false ? 'Hapus'
+              : <CircularProgress
+                size={20}
+                color="primary"
+              />
+          }
+        </Button>
+      </Typography>
+    </Modal>
+  )
+};
+
 const TableData = () => {
 
   const classes = useStyles()
-  const [visibleModal, setVisibleModal] = React.useState(false)
-  const onOpenModalEdit = () => setVisibleModal(true);
-  const onCloseModal = () => setVisibleModal(false);
+  const [visibleModalEdit, setVisibleModalEdit] = React.useState(false)
+  const onOpenModalEdit = () => setVisibleModalEdit(true);
+  const onCloseModalEdit = () => setVisibleModalEdit(false);
 
-  function eventCloseModal() {
-    onCloseModal()
+  function eventCloseModalEdit() {
+    setnamaBarang('')
+    sethargaBeli(0)
+    sethargaJual(0)
+    setstok(0)
+    setimagePreview('')
+    setimageContent('')
+    onCloseModalEdit()
   }
+
+  const [visibleModalDelete, setVisibleModalDelete] = React.useState(false)
+  const onOpenModalDelete = () => setVisibleModalDelete(true);
+  const onCloseModalDelete = () => setVisibleModalDelete(false);
+
+  function eventCloseModalDelete() {
+    onCloseModalDelete()
+  }
+
 
   const [open, setOpen] = React.useState(false);
   const [editedIndex, seteditedIndex] = React.useState(0);
   const [loadingCircular, setLoadingCircular] = React.useState(false);
 
-  const [idbarang, setidbarang] = React.useState(0)
+  const [idbarang, setidbarang]: any = React.useState(0)
   const [namaBarang, setnamaBarang] = React.useState('')
   const [hargaBeli, sethargaBeli] = React.useState(0)
   const [hargaJual, sethargaJual] = React.useState(0)
@@ -310,40 +381,21 @@ const TableData = () => {
   const [isPublish, setisPublish]: any = React.useState<any>(false)
 
   const columns: any[] = [
-    {
-      name: "id",
-      label: "ID",
-    },
-    {
-      name: "nama_barang",
-      label: "Nama Barang",
-    },
-    {
-      name: "harga_beli",
-      label: "Harga Beli",
-    },
-    {
-      name: "harga_jual",
-      label: "Harga Jual",
-    },
-    {
-      name: "foto",
-      label: "Foto",
+    { name: "id", label: "ID", },
+    { name: "nama_barang", label: "Nama Barang", },
+    { name: "harga_beli", label: "Harga Beli", },
+    { name: "harga_jual", label: "Harga Jual", },
+    { name: "foto", label: "Foto",
       options: {
-        customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
-          return(
-            <img src={`${DevImageUrl}/${value}`} style={{width: '80px'}}/>
-          )
+          customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+            return(
+              <img src={`${DevImageUrl}/${value}`} style={{width: '80px'}}/>
+            )
+          }
         }
-      }
-    },
-    {
-      name: "stok",
-      label: "Stok",
-    },
-    {
-      name: "id",
-      label: "Actions",
+      },
+    { name: "stok", label: "Stok", },
+    { name: "id", label: "Actions",
       options: {
         customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
           return (
@@ -360,7 +412,13 @@ const TableData = () => {
               >
                 <MdModeEdit color="#2196f3"/>
               </IconButton>
-              <IconButton aria-label="delete">
+              <IconButton 
+                aria-label="delete"
+                onClick={() => {
+                  setidbarang(value)
+                  onOpenModalDelete()
+                }}
+              >
                 <MdDelete color="#e91e63"/>
               </IconButton>
             </>
@@ -409,10 +467,10 @@ const TableData = () => {
     setimagePreview('')
   }
 
-  const closeModal = () => {
-    clearForm()
-    setOpen(false);
-  };
+  // const closeModal = () => {
+  //   clearForm()
+  //   setOpen(false);
+  // };
 
   const httpReadBarang = async () => {
     try {
@@ -439,12 +497,12 @@ const TableData = () => {
 
       const responseAddbarang = await HTTPAddBarang(data)
       console.log(responseAddbarang)
-
+      
       httpReadBarang()
-
+      
       setTimeout(() => {
         setLoadingCircular(false)
-        closeModal()
+        clearForm()
       }, 1000);
     } catch (error) {
       console.log(error)
@@ -452,7 +510,25 @@ const TableData = () => {
     }
   }
 
-  
+  const httpDelete = async () => {
+    setLoadingCircular(true)
+
+    try {
+      const responseDeletebarang = await HTTPDeleteBarang({id: idbarang})
+      console.log(responseDeletebarang)
+
+      httpReadBarang()
+
+      setTimeout(() => {
+        setLoadingCircular(false)
+        eventCloseModalDelete()
+      }, 1000);
+    } catch (error) {
+      console.log(error)
+      setLoadingCircular(false)
+      eventCloseModalDelete()
+    }
+  }
 
   // Lifecycle
 
@@ -461,6 +537,7 @@ const TableData = () => {
   }, [])
 
   React.useEffect(() => {
+    // httpReadBarang()
     // console.log(datatables)
   }, [datatables])
   
@@ -468,8 +545,8 @@ const TableData = () => {
     <Typography component="div" style={{marginTop: '60px', marginLeft:'10px', marginRight: '10px'}}>
       
       <ModalEdit 
-        visibleModal={visibleModal} 
-        closeModal={eventCloseModal} 
+        visibleModalEdit={visibleModalEdit} 
+        closeModalEdit={eventCloseModalEdit} 
         data={{
           id: idbarang,
           nama_barang: namaBarang,
@@ -480,6 +557,12 @@ const TableData = () => {
           foto_baru: imagePreview
         }}
         httpGetdata={httpReadBarang}
+      />
+
+      <ModalDelete
+        visibleModalDelete={visibleModalDelete}
+        closeModalDelete={eventCloseModalDelete}
+        httpDeleteData={httpDelete}
       />
 
       <Button
@@ -493,7 +576,7 @@ const TableData = () => {
         <MdAdd />
       </Button>
       
-      <Dialog open={open} onClose={closeModal} aria-labelledby="form-dialog-title">
+      <Dialog open={open} onClose={() => {clearForm()}} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">
           {editedIndex === 0 ? 'Tambah Data' : 'Edit Data'}
         </DialogTitle>
@@ -577,7 +660,7 @@ const TableData = () => {
             }
 
             <Typography component="div" style={{ marginTop: '10px' }}>
-              <Button onClick={closeModal} color="secondary" disabled={loadingCircular}>
+              <Button onClick={() => {clearForm()}} color="secondary" disabled={loadingCircular}>
                 Batal
               </Button>
               <Button 
