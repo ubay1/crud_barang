@@ -17,12 +17,10 @@ const ROUTES = [
     key: "APP_INTRO", 
     exact: true, 
     component: (props: any) => {
-      // console.log(props)
       if (!Cookies.get("token")) {
-        return <Intro />;
+        return <Intro {...props}/>;
       } else {
-        alert('anda masih memiliki akses.')
-        return <Redirect to={"/"} />;
+        return <Redirect to={{ pathname: "/", state: { message: 'anda masih memiliki akses.' } }} />;
       }
     }
   },
@@ -31,11 +29,9 @@ const ROUTES = [
     exact: true, 
     component: (props: any) => {
       if (!Cookies.get("token")) {
-        alert('anda tidak memiliki akses.')
-        return <Redirect to={"/intro"} />;
+        return <Redirect to={{ pathname: "/intro", state: { message: 'anda tidak memiliki akses.'} }} />;
       } else {
-        // alert('anda masih memiliki akses.')
-        return <Home />;;
+        return <Home {...props}/>;
       }
     }
   },
@@ -43,17 +39,13 @@ const ROUTES = [
 
 export default ROUTES;
 
-/**
- * Render a route with potential sub routes
- * https://reacttraining.com/react-router/web/example/route-config
- */
 function RouteWithSubRoutes(route: any) {
-  // console.log('props compoennt route = ', dataSocket)
   return (
     <Route
       path={route.path}
       exact={route.exact}
       render={props => {
+        console.log('propss = ',props)
         return(<route.component {...props} routes={route.routes} />)
       }}
     />
@@ -63,13 +55,13 @@ function RouteWithSubRoutes(route: any) {
 /**
  * Use this component for any new section of routes (any config object that has a "routes" property
  */
-export function RenderRoutes({ routes, dataSocket }: any) {
+export function RenderRoutes({ routes }: any) {
   const userRedux = useSelector((state: RootState) => state.user)
   const dispatch: AppDispatch = useDispatch()
 
   useEffect(() => {
     if (userRedux.token !== '') {
-      console.log('token ada')
+      console.log('%ctoken ada', 'background:#000; padding:10px; color:#fff;')
     } else {
       initialStateUserAuthByAsync(dispatch)
     }
@@ -78,6 +70,7 @@ export function RenderRoutes({ routes, dataSocket }: any) {
   return (
     <Switch>
       {routes.map((route: any, i: number) => {
+        // console.log('routes = ',route)
         return <RouteWithSubRoutes key={route.key} {...route} />;
       })}
       <Route component={() => <PageNotFound />} />

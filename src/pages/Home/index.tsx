@@ -6,6 +6,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { RootState } from '../../store/rootReducer';
+import TableData from "../../components/home/TableData";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const Home = () => {
+const Home = (props: any) => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -68,20 +69,10 @@ const Home = () => {
               }}
             >Keluar</MenuItem>
           </Menu>
-          {/* <Button
-            color="inherit"
-            onClick={()=>{
-              Cookies.remove('token')
-              localStorage.removeItem('username')
-              // window.location.replace('/intro')
-              history.push('/intro')
-            }}
-          >
-            <span>Keluar</span>
-            <IoLogOutOutline style={{marginLeft: 10}} size="20"/>
-          </Button> */}
         </Toolbar>
       </AppBar>
+
+      <TableData />
     </div>
   )
 }

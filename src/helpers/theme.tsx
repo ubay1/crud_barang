@@ -1,4 +1,5 @@
 import { createMuiTheme } from "@material-ui/core";
+import { pink } from "@material-ui/core/colors";
 import { blue, grey } from "@material-ui/core/colors";
 
 const ThemeMUI = createMuiTheme({
@@ -9,7 +10,7 @@ const ThemeMUI = createMuiTheme({
       // dark: grey[900],
     },
     secondary: {
-      main: '#42b72a',
+      main: pink[500],
     },
     grey: grey 
   },
