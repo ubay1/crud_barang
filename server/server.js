@@ -71,8 +71,8 @@ app.post("/api/barang", (req, res, next) => {
   }
 
   // Base64 to Img
-    let base64Image = req.body.foto.split(";base64,").pop();
-    let base64Type = req.body.foto.split(";base64,", 1).pop();
+  let base64Image = req.body.foto.split(";base64,").pop();
+  let base64Type = req.body.foto.split(";base64,", 1).pop();
 
     if (base64Type === "data:image/jpeg" || base64Type === "data:image/jpg" || base64Type === "data:image/png") {
       try {
@@ -114,37 +114,94 @@ app.post("/api/barang", (req, res, next) => {
     }
 })
 
-app.patch("/api/barang/:id", (req, res, next) => {
+app.put("/api/barang/:id", (req, res, next) => {
   var data = {
     nama_barang: req.body.nama_barang,
     harga_beli: req.body.harga_beli,
     harga_jual: req.body.harga_jual,
-    foto: req.body.foto,
+    foto: req.body.foto_baru,
     stok: req.body.stok,
   }
-  db.run(
-    `UPDATE barang set 
-      nama_barang = coalesce(?,nama_barang), 
-      harga_beli = COALESCE(?,harga_beli), 
-      harga_jual = coalesce( ? , harga_jual),
-      foto = coalesce( ? , foto),
-      stok = coalesce( ? , stok)
-    WHERE id = ?`,
+  // return console.log(req.body);
 
-    [data.nama_barang, data.harga_beli, data.harga_jual, data.foto, data.stok, req.params.id],
-
-    (err, result) => {
-      if (err) {
-        res.status(400).json({
-          "error": res.message
+  if (req.body.foto_baru !== '') {
+    fs.unlinkSync(rootDir + next_path + req.body.foto_lama)
+    // Base64 to Img
+    let base64Image = req.body.foto.split(";base64,").pop();
+    let base64Type = req.body.foto.split(";base64,", 1).pop();
+  
+    if (base64Type === "data:image/jpeg" || base64Type === "data:image/jpg" || base64Type === "data:image/png") {
+      try {
+  
+        fs.writeFile(
+          rootDir + next_path + photo_file, base64Image, {
+            encoding: "base64"
+          },
+          function (err) {
+            console.log("File created " + photo_file);
+          }
+        );
+  
+        db.run(
+          `UPDATE barang set 
+        nama_barang = coalesce(?,nama_barang), 
+        harga_beli = COALESCE(?,harga_beli), 
+        harga_jual = coalesce( ? , harga_jual),
+        foto = coalesce( ? , foto),
+        stok = coalesce( ? , stok)
+        WHERE id = ?`,
+  
+        [data.nama_barang, data.harga_beli, data.harga_jual, photo_file, data.stok, req.params.id],
+  
+        (err, result) => {
+          if (err) {
+            res.status(400).json({
+              "error": res.message
+            })
+            return;
+          }
+          res.json({
+            message: "sukses update",
+            data: data
+          })
+        });
+      } catch (error) {
+        res.status(500).json({
+          "message": "gagal menyimpan data",
         })
-        return;
       }
-      res.json({
-        message: "sukses update",
-        data: data
+    } else {
+      res.status(500).json({
+        "message": "file gambar harus bertipe JPG/JPEG/PNG",
       })
-    });
+    }
+
+  } else {
+    db.run(
+      `UPDATE barang set 
+        nama_barang = coalesce(?,nama_barang), 
+        harga_beli = COALESCE(?,harga_beli), 
+        harga_jual = coalesce( ? , harga_jual),
+        foto = coalesce( ? , foto),
+        stok = coalesce( ? , stok)
+        WHERE id = ?`,
+
+      [data.nama_barang, data.harga_beli, data.harga_jual, data.foto_lama, data.stok, req.params.id],
+
+      (err, result) => {
+        if (err) {
+          res.status(400).json({
+            "error": res.message
+          })
+          return;
+        }
+        res.json({
+          message: "sukses update",
+          data: data
+        })
+      });
+  }
+
 })
 
 app.delete("/api/barang/:id", (req, res, next) => {

@@ -1,0 +1,6 @@
+.MuiAppBar-root {
+  z-index: 1000 !important;
+}
+.react-responsive-modal-closeButton {
+  /* top: 40px !important; */
+}
