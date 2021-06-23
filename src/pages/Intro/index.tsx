@@ -8,11 +8,14 @@ import { AppDispatch } from '../../store';
 import { setAuthStatus, setReduxUsername } from '../../store/user';
 import { randomString } from "../../helpers/randomString";
 import { useHistory } from 'react-router-dom';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		root: {
-			backgroundColor: ThemeMUI.palette.primary.light,
+      backgroundImage: "url('https://transflo.com/wp-content/uploads/2019/10/warehouse-header.jpg')",
+      backgroundSize: "cover",
+			// backgroundColor: ThemeMUI.palette.primary.light,
 			height: '100vh',
       display: 'flex',
 			justifyContent: 'center',
@@ -77,6 +80,9 @@ const Intro = () => {
         noValidate autoComplete="off"
         onSubmit={formik.handleSubmit}
       >
+        <Typography variant="h5" className="title_font" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px', color: ThemeMUI.palette.primary.main,}}>
+          Stok Barang
+        </Typography>
         <FormControl 
           error={formik.errors.nama ? true : false} 
           variant="outlined" fullWidth

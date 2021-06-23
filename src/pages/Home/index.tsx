@@ -6,7 +6,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { RootState } from '../../store/rootReducer';
-import TableData from "../../components/home/TableData";
+import TableDatas from "../../components/home/TableDatas";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    fontFamily: 'Pacifico'
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -47,8 +48,8 @@ const Home = (props: any) => {
     <div className={classes.root}>
       <AppBar position="fixed" color="primary">
         <Toolbar variant="dense">
-          <Typography className={classes.title} variant="h6" color="inherit">
-            CRUD Barang
+          <Typography className={`${classes.title}`} variant="h6" color="inherit">
+            Stok Barang
           </Typography>
           <Button aria-controls="simple-menu" aria-haspopup="true" color="inherit" onClick={handleClick}>
             {username}
@@ -72,7 +73,7 @@ const Home = (props: any) => {
         </Toolbar>
       </AppBar>
 
-      <TableData />
+      <TableDatas />
     </div>
   )
 }

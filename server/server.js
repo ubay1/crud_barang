@@ -43,6 +43,8 @@ app.get("/api/barangs", (req, res, next) => {
 });
 
 app.get("/api/barang/:id", (req, res, next) => {
+  let next_path = "/server/uploads/";
+  
   var sql = "select * from barang where id = ?"
   var params = [req.params.id]
   db.get(sql, params, (err, row) => {
@@ -84,6 +86,13 @@ app.post("/api/barang", (req, res, next) => {
     stok: req.body.stok,
   }
 
+  if (req.body.nama_barang === '' || req.body.harga_beli === '' || req.body.harga_jual === '' || 
+  req.body.foto === '' || req.body.stok === '') {
+    res.status(400).json({
+      message: 'harap isi semua form yang disediakan'
+    })
+  }
+
   // Base64 to Img
   let base64Image = req.body.foto.split(";base64,").pop();
   let base64Type = req.body.foto.split(";base64,", 1).pop();
@@ -105,7 +114,8 @@ app.post("/api/barang", (req, res, next) => {
         db.run(sql, params, function (err, result) {
           if (err) {
             res.status(400).json({
-              "error": err.message
+              error: err,
+              message: 'terjadi kesalahan'
             })
             return;
           }
@@ -172,8 +182,9 @@ app.put("/api/barang/:id", (req, res, next) => {
   
         (err, result) => {
           if (err) {
-            res.status(400).json({
-              "error": res.message
+            res.status(500).json({
+              error: err,
+              message: 'nama barang telah digunakan'
             })
             return;
           }
@@ -207,8 +218,9 @@ app.put("/api/barang/:id", (req, res, next) => {
 
       (err, result) => {
         if (err) {
-          res.status(400).json({
-            "error": res.message
+          res.status(500).json({
+            error: err,
+            message: 'nama barang telah digunakan'
           })
           return;
         }
